@@ -15,15 +15,33 @@ const Map = (props) => {
         }}
       >
         <Marker
-          title="me"
-          description="it is me now"
+          title="Я"
+          description="мое местоположение"
           coordinate={{
             latitude: props.position.coords.latitude,
             longitude: props.position.coords.longitude,
           }}
         />
+
+        <Marker
+          title="Максим"
+          description="мой друг"
+          pinColor="#0080FF"
+          coordinate={{
+            latitude: 46.3078,
+            longitude: 44.2558,
+          }}
+        />
+        <Marker
+          title="Наталья"
+          description="моя подруга"
+          pinColor="#0080FF"
+          coordinate={{
+            latitude: 46.30,
+            longitude: 44.25,
+          }}
+        />
       </MapView>
-      <Text>lorem lorem slovo</Text>
     </View>
   );
 };
