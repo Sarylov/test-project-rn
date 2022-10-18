@@ -3,8 +3,10 @@ import { Text, View } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 
 const Map = (props) => {
+  const { myPos } = props;
+
   return (
-    <View style={{ flex: 1, width: "100%" }}>
+    <>
       <MapView
         style={{ flex: 1 }}
         initialRegion={{
@@ -18,8 +20,8 @@ const Map = (props) => {
           title="Я"
           description="мое местоположение"
           coordinate={{
-            latitude: props.position.coords.latitude,
-            longitude: props.position.coords.longitude,
+            latitude: myPos.coords.latitude,
+            longitude: myPos.coords.longitude,
           }}
         />
 
@@ -37,12 +39,12 @@ const Map = (props) => {
           description="моя подруга"
           pinColor="#0080FF"
           coordinate={{
-            latitude: 46.30,
+            latitude: 46.3,
             longitude: 44.25,
           }}
         />
       </MapView>
-    </View>
+    </>
   );
 };
 
