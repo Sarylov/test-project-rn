@@ -1,4 +1,4 @@
-import { View, StyleSheet, Button, LogBox } from "react-native";
+import { View, StyleSheet, Button, LogBox, Text } from "react-native";
 import { useEffect, useState } from "react";
 import { pushUser } from "./../helper/db/pushUser";
 import Map from "../components/Map";
@@ -6,29 +6,67 @@ import { updateUser } from "./../helper/db/updateUser";
 import { deleteUser } from "./../helper/db/deleteUser";
 import { onValue, ref } from "firebase/database";
 import { db } from "../database";
+import { AsyncStorage } from "react-native";
+import getLocation from "../helper/getLocation";
 
 export default function MapScreen(props) {
-  const { location, name, setLocation } = props;
+  const { location, name, setLocation, userId, setUserId } = props;
 
-  const [userId, setUserId] = useState(null);
-  const [userPos, setUserPos] = useState(null);
+  const [usersPos, setUsersPos] = useState(null);
+
+  const setKey = async (uId) => {
+    try {
+      await AsyncStorage.setItem("userId", uId);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
-    onValue(ref(db, "users/"), (s) => setUserPos(s));
-    setUserId(pushUser(name, location));
+    onValue(ref(db, "users/"), (s) => setUsersPos(s.val()));
+    console.log("map " + userId);
+    if (!userId) {
+      const uId = pushUser(name, location);
+      setKey(uId);
+      setUserId(uId);
+    }
   }, []);
 
   const disable = () => {
     setLocation(null); //переключает на home
     deleteUser(userId); //удаляет текущую запись из бд
+    // setKey(null);
+    (async function removeKey() {
+      try {
+        await AsyncStorage.removeItem("userId");
+      } catch (error) {
+        console.log(error);
+      }
+    })();
+    setUserId(null);
+  };
+
+  const update = async () => {
+    let response = await getLocation();
+    if (response.coords) {
+      setLocation(response);
+      updateUser(userId, response);
+    }
   };
 
   return (
     <View>
-      <Map myPos={location} />
+      {usersPos ? (
+        <Map myPos={location} usersPos={usersPos} userId={userId} />
+      ) : (
+        <Text style={{ alignItems: "center", justifyContent: "center" }}>
+          loading...
+        </Text>
+      )}
       <View style={styles.btnWrapper}>
         {/* <Button title="обновить" onPress={updateUser(userId, location)} /> */}
         <Button title="отключиться" onPress={disable} />
+        <Button title="обновить" onPress={update} />
       </View>
     </View>
   );

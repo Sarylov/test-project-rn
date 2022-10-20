@@ -3,7 +3,7 @@ import { db } from "../../database";
 
 export const updateUser = (userId, pos) => {
   update(ref(db, `users/${userId}`), {
-    latitude: pos.latitude,
-    longitude: pos.longitude,
+    latitude: pos.coords.latitude,
+    longitude: pos.coords.longitude,
   });
 };

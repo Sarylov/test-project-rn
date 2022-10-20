@@ -1,22 +1,41 @@
-import { Alert, Button, Text, TextInput, View, StyleSheet } from "react-native";
+import { useEffect } from "react";
+import { Button, Text, TextInput, View, StyleSheet } from "react-native";
 import getLocation from "../helper/getLocation";
+import { AsyncStorage } from "react-native";
 
 export default function HomeScreen(props) {
-  const { name, setName, setLocation } = props;
+  const { userId, setUserId, name, setName, setLocation } = props;
 
   const start = async () => {
-    let response = await getLocation();
+    console.log("home " + userId);
 
-    if (response.coords) setLocation(response);
-    else
-      Alert.alert("ошибка подключения", [
-        {
-          text: "обновить",
-          onPress: start,
-        },
-        { text: "закрыть", style: "cancel" },
-      ]);
+    if (userId) {
+      setLocation(true);
+    } else {
+      let response = await getLocation();
+      if (response.coords) setLocation(response);
+    }
   };
+
+  const getKey = async () => {
+    try {
+      const value = await AsyncStorage.getItem("userId");
+      if (value !== null) {
+        setUserId(value);
+        return;
+      }
+    } catch (error) {
+      console.log("error " + error);
+    }
+  };
+
+  useEffect(() => {
+    getKey();
+  }, []);
+
+  useEffect(() => {
+    if (userId) setLocation(true);
+  }, [userId]);
 
   return (
     <View>

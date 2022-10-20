@@ -3,7 +3,8 @@ import { Text, View } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 
 const Map = (props) => {
-  const { myPos } = props;
+  const { usersPos, userId } = props;
+  const kays = Object.keys(usersPos);
 
   return (
     <>
@@ -16,33 +17,18 @@ const Map = (props) => {
           longitudeDelta: 0.0421,
         }}
       >
-        <Marker
-          title="Я"
-          description="мое местоположение"
-          coordinate={{
-            latitude: myPos.coords.latitude,
-            longitude: myPos.coords.longitude,
-          }}
-        />
-
-        <Marker
-          title="Максим"
-          description="мой друг"
-          pinColor="#0080FF"
-          coordinate={{
-            latitude: 46.3078,
-            longitude: 44.2558,
-          }}
-        />
-        <Marker
-          title="Наталья"
-          description="моя подруга"
-          pinColor="#0080FF"
-          coordinate={{
-            latitude: 46.3,
-            longitude: 44.25,
-          }}
-        />
+        {kays.map((kay) => {
+          return (
+            <Marker
+              title={usersPos[[kay]].username}
+              pinColor={kay === userId ? "#ff0000" : "#0080FF"}
+              coordinate={{
+                latitude: usersPos[[kay]].latitude,
+                longitude: usersPos[[kay]].longitude,
+              }}
+            />
+          );
+        })}
       </MapView>
     </>
   );
