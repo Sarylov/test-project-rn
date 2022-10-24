@@ -7,8 +7,6 @@ export default function HomeScreen(props) {
   const { userId, setUserId, name, setName, setLocation } = props;
 
   const start = async () => {
-    console.log("home " + userId);
-
     if (userId) {
       setLocation(true);
     } else {

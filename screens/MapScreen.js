@@ -1,4 +1,4 @@
-import { View, StyleSheet, Button, LogBox, Text } from "react-native";
+import { View, StyleSheet, Button, Text } from "react-native";
 import { useEffect, useState } from "react";
 import { pushUser } from "./../helper/db/pushUser";
 import Map from "../components/Map";
@@ -24,7 +24,6 @@ export default function MapScreen(props) {
 
   useEffect(() => {
     onValue(ref(db, "users/"), (s) => setUsersPos(s.val()));
-    console.log("map " + userId);
     if (!userId) {
       const uId = pushUser(name, location);
       setKey(uId);
@@ -59,9 +58,7 @@ export default function MapScreen(props) {
       {usersPos ? (
         <Map myPos={location} usersPos={usersPos} userId={userId} />
       ) : (
-        <Text style={{ alignItems: "center", justifyContent: "center" }}>
-          loading...
-        </Text>
+        <Text>loading...</Text>
       )}
       <View style={styles.btnWrapper}>
         {/* <Button title="обновить" onPress={updateUser(userId, location)} /> */}

@@ -1,12 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { Text, View, StyleSheet, Button, TextInput } from "react-native";
-import Map from "./components/Map";
-import getLocation from "./helper/getLocation";
-import { ref, set, update, onValue, push } from "firebase/database";
-import { db } from "./database";
+import React, { useState } from "react";
+import { View, StyleSheet } from "react-native";
 import HomeScreen from "./screens/HomeScreen";
 import MapScreen from "./screens/MapScreen";
-import { AsyncStorage } from "react-native";
 
 export default function App() {
   const [location, setLocation] = useState(null);
