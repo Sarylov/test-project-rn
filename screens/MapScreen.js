@@ -1,5 +1,5 @@
 import { View, StyleSheet, Button, Text } from "react-native";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { pushUser } from "./../helper/db/pushUser";
 import Map from "../components/Map";
 import { updateUser } from "./../helper/db/updateUser";
@@ -11,8 +11,8 @@ import getLocation from "../helper/getLocation";
 
 export default function MapScreen(props) {
   const { location, name, setLocation, userId, setUserId } = props;
-
   const [usersPos, setUsersPos] = useState(null);
+  const intervalId = useRef();
 
   const setKey = async (uId) => {
     try {
@@ -22,19 +22,33 @@ export default function MapScreen(props) {
     }
   };
 
+  const startInterval = () => {
+    const id = setInterval(() => {
+      console.log("reload");
+      update();
+    }, 10000);
+
+    intervalId.current = id;
+  };
+
   useEffect(() => {
     onValue(ref(db, "users/"), (s) => setUsersPos(s.val()));
     if (!userId) {
       const uId = pushUser(name, location);
       setKey(uId);
       setUserId(uId);
+    } else {
+      update();
     }
+    startInterval();
+
+    return () => {
+      clearInterval(intervalId.current);
+    };
   }, []);
 
   const disable = () => {
-    setLocation(null); //переключает на home
     deleteUser(userId); //удаляет текущую запись из бд
-    // setKey(null);
     (async function removeKey() {
       try {
         await AsyncStorage.removeItem("userId");
@@ -43,14 +57,21 @@ export default function MapScreen(props) {
       }
     })();
     setUserId(null);
+    setLocation(null);
   };
 
   const update = async () => {
     let response = await getLocation();
-    if (response.coords) {
-      setLocation(response);
-      updateUser(userId, response);
-    }
+    let coords = response.coords;
+    console.log(Math.abs(usersPos[userId].latitude - coords.latitude));
+    if (
+      Math.abs(usersPos[userId].latitude - coords.latitude) > 0.0001 ||
+      Math.abs(usersPos[userId].longitude - coords.longitude) > 0.0001
+    )
+      if (coords) {
+        setLocation(response);
+        updateUser(userId, response);
+      }
   };
 
   return (

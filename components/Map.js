@@ -7,88 +7,84 @@ export default function MapComponent(props) {
   const usersKeys = Object.keys(usersPos);
 
   const initialHTMLContent = () => {
-    const markers = ` ${usersKeys.map((key) => {
+    const markers = ` [${usersKeys.map((key) => {
       return `{
-        geometry: {
-          type: "Point",
-          coordinates: [${usersPos[key].longitude}, ${usersPos[key].latitude}],
-        },
+        pos:[${usersPos[key].latitude}, ${usersPos[key].longitude}], 
+        title:"${usersPos[key].username}",
+        icon: ${key == userId ? "myIcon " : "friendIcon"}
       }`;
-    })}`;
+    })}]`;
 
     let res = `
-  <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>Display a map on a webpage</title>
-    <meta
-      name="viewport"
-      content="initial-scale=1,maximum-scale=1,user-scalable=no"
-    />
-    <link
-      href="https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.css"
-      rel="stylesheet"
-    />
-    <script src="https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.js"></script>
-    <style>
-      body {
-        margin: 0;
-        padding: 0;
-      }
-      #map {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        width: 100%;
-      }
-      .marker {
-        background-image: url("https://img.icons8.com/color/344/map-pin.png");
-        background-size: cover;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        cursor: pointer;
-        
-      }
-    </style>
-  </head>
-  <body>
-    <div id="map"></div>
-    <script>
-      const geojson = {
-        features:  [${markers}]
-      };
-      mapboxgl.accessToken =
-        "pk.eyJ1IjoiamFsc2FuIiwiYSI6ImNsOWs4MDJ0ZDBkazUzdXBsOGt5NTNpY3AifQ.VCfcKZFqfAsT603Y1Selaw";
-      const map = new mapboxgl.Map({
-        container: "map", // container ID
-        // Choose from Mapbox's core styles, or make your own style with Mapbox Studio
-        style: "mapbox://styles/mapbox/streets-v11", // style URL
-        center: [44.2558, 46.3078], // starting position [lng, lat]
-        zoom: 12, // starting zoom
-        projection: "globe", // display the map as a 3D globe
-      });
-
-      map.on("style.load", () => {
-        map.setFog({}); // Set the default atmosphere style
-      });
-
-      // add markers to map
-      for (const feature of geojson.features) {
-        // create a HTML element for each feature
-        const el = document.createElement("div");
-        el.className = "marker";
-        console.log(el);
-
-        // make a marker for each feature and add to the map
-        new mapboxgl.Marker(el)
-          .setLngLat(feature.geometry.coordinates)
-          .addTo(map);
-      }
-    </script>
-  </body>
-</html>
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Добавление метки с собственным изображением</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <!--
+            Укажите свой API-ключ. Тестовый ключ НЕ БУДЕТ работать на других сайтах.
+            Получить ключ можно в Кабинете разработчика: https://developer.tech.yandex.ru/keys/
+        -->
+        <script
+          src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&amp"
+          type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+          ymaps.ready(function () {
+            const myIcon = {
+              iconLayout: "default#imageWithContent",
+              iconImageHref:
+                "https://cdn-icons-png.flaticon.com/512/2838/2838709.png",
+              iconImageSize: [48, 48],
+              iconImageOffset: [-24, -48],
+              iconContentLayout: MyIconContentLayout,
+            };
+            const friendIcon = {
+              iconLayout: "default#imageWithContent",
+              iconImageHref:
+                "https://cdn-icons-png.flaticon.com/512/2377/2377922.png",
+              iconImageSize: [50, 50],
+              iconImageOffset: [-25, -50],
+              iconContentLayout: MyIconContentLayout,
+            };
+    
+            const placemarks = ${markers}
+    
+            var myMap = new ymaps.Map("map", {
+                center: [46.3078, 44.2558],
+                zoom: 13,
+              }),
+              // Создаём макет содержимого.
+              MyIconContentLayout = ymaps.templateLayoutFactory.createClass(
+                '<div style="color: ; font-weight: bold;">$[properties.iconContent]</div>'
+              );
+            placemarks.forEach((placemarkInfo) => {
+              const placemark = new ymaps.Placemark(
+                placemarkInfo.pos,
+                { balloonContent: placemarkInfo.title },
+                placemarkInfo.icon
+              );
+    
+              myMap.geoObjects.add(placemark);
+            });
+          });
+        </script>
+        <style>
+          html,
+          body,
+          #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+          }
+        </style>
+      </head>
+      <body>
+        <div id="map"></div>
+      </body>
+    </html>
+    
 `;
 
     return res;

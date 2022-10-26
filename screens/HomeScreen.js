@@ -7,12 +7,8 @@ export default function HomeScreen(props) {
   const { userId, setUserId, name, setName, setLocation } = props;
 
   const start = async () => {
-    if (userId) {
-      setLocation(true);
-    } else {
-      let response = await getLocation();
-      if (response.coords) setLocation(response);
-    }
+    let response = await getLocation();
+    if (response.coords) setLocation(response);
   };
 
   const getKey = async () => {
@@ -32,7 +28,7 @@ export default function HomeScreen(props) {
   }, []);
 
   useEffect(() => {
-    if (userId) setLocation(true);
+    if (userId) start();
   }, [userId]);
 
   return (
